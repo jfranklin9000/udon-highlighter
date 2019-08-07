@@ -1,0 +1,97 @@
+```
+# header 1
+
+## header 2
+
+### header 3
+
+#### header 4
+
+##### header 5
+
+###### header 6
+
+####### not a header
+
+```
+
+# header 1
+
+## header 2
+
+### header 3
+
+#### header 4
+
+##### header 5
+
+###### header 6
+
+_crashes parser, so showing as inline code:_
+
+`####### not a header`
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+```
+_not a header (hax):_
+
+#
+
+_header (hax ace):_
+
+# 
+
+```
+
+_not a header (hax):_
+
+#
+
+_header (hax ace) (look at DOM to see empty `<h3></h3>`):_
+
+# 
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+```
+#  not a header
+
+#not a header
+
+ # not a header
+
+```
+
+_shows as header:_
+
+#  not a header
+
+_doesn't show leading hax:_
+
+#not a header
+
+_crashes parser, so showing as inline code:_
+
+`\ # not a header`
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+```
+not a header 2 in udon
+===
+
+not a header 3 in udon
+---
+
+```
+
+_crashes parser, so showing as inline code:_
+
+not a header 2 in udon
+`===`
+
+_(horizontal rule) crashes parser, so showing as inline code:_
+
+not a header 3 in udon
+`---`
