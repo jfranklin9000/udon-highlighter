@@ -134,9 +134,10 @@ From the shell:
 
 ## QUESTIONS
 
-- should we fail gracefully?
+- Should we fail gracefully?
 
-- the udon docs say a header are haxes followed
-  by a single space followed by the actual text
-  => do we want to enforce a single space?
-  (the parser doesn't now)
+- The udon docs say a header are haxes followed
+  by a single space followed by the actual text.
+  Do we want to enforce a single space?
+  The parser doesn't now; I guess the "actual text"
+  can start with spaces.
