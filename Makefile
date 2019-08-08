@@ -2,12 +2,15 @@
 # August 7, 2019
 
 UDONS = \
-  static-site/headers.udon \
-  static-site/italics-bold.udon \
-  static-site/misc.udon \
-  static-site/README.udon
+	static-site/headers.udon \
+	static-site/italics-bold.udon \
+	static-site/misc.udon \
+	static-site/README.udon
 
 all: $(UDONS)
+
+css:
+	php css.php
 
 clean:
 	rm static-site/*.udon
