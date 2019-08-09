@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+<title>CodeMirror</title>
+<meta charset="utf-8"/>
+<script src="CodeMirror/lib/codemirror.js"></script>
+<link rel="stylesheet" href="CodeMirror/lib/codemirror.css">
+<style>
+body { background: lightgray; }
+p { font-size: 24px; padding: 0 20px; }
+#udon { padding: 0 20px; }
+#markdown { padding: 0 20px; }
+</style>
+<script src="CodeMirror/mode/udon/udon.js"></script>
+<script src="CodeMirror/mode/markdown/markdown.js"></script>
+</head>
+<body>
+<p>udon</p>
+<div id="udon"></div>
+<br>
+<p>markdown</p>
+<div id="markdown"></div>
+<script>
+var udon = CodeMirror(document.getElementById("udon"), { mode: "udon" });
+var markdown = CodeMirror(document.getElementById("markdown"), { mode: "markdown" });
+</script>
+</body>
+</html>

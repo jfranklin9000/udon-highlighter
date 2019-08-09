@@ -1,26 +1,84 @@
 
 
-*bold*
-
 _italic_
 
-**not bold**
+*bold*
 
-__not italic__
+__not italic__ (but the dom is `<i></i>not italic<i></i>`)
 
-*_bold italic_*
+**not bold** (but the dom is `<b></b>not bold<b></b>`)
 
 _*italic bold*_
 
+*_bold italic_*
+
 -- -- -- --
 
-*MOVE THIS TO BACKSLASH SNIP*
+_ hello _
 
-Here is some *bold* text.
+_hello
+goodbye_
 
-Here is some \*non-bold* text.
+_hello                 HIGHLIGHTER SHOULD NOT BE ITALIC (INHERITED FROM MARKDOWN)
 
-Here is some _italic_ text.
+goodbye_
 
-Here is some \_non-italic_ text.
+_hello                 HIGHLIGHTER SHOULD NOT BE ITALIC (INHERITED FROM MARKDOWN)
+
+hello_goodbye_
+
+_hello *goodbye* hello_
+
+123_hello_456
+
+-- -- -- --
+
+* goodbye *
+
+*hello
+goodbye*
+
+*hello                  HIGHLIGHTER SHOULD NOT BE BOLD (INHERITED FROM MARKDOWN)
+
+goodbye*
+
+*hello                  HIGHLIGHTER SHOULD NOT BE BOLD (INHERITED FROM MARKDOWN)
+
+hello*goodbye*
+
+*hello _goodbye_ hello*
+
+123*hello*456
+
+-- -- -- --
+
+_hello *goodbye_ hello         IN HIGHLIGHTER: GOODBYE SHOULD NOT BE BOLD
+
+*hello _goodbye* hello         IN HIGHLIGHTER: GOODBYE SHOULD NOT BE ITALICS
+
+_hello *goodbye_* urbit        IN HIGHLIGHTER: GOODBYE SHOULD NOT BE BOLD, URBIT SHOULD NOT BE BOLD
+
+*hello _goodbye*_ urbit        IN HIGHLIGHTER: GOODBYE SHOULD NOT BE ITALICS, URBIT SHOULD NOT BE ITALICS
+
+-- -- -- --
+
+_hello*goodbye*hello_
+
+*hello_goodbye_hello*
+
+THE REST HAVE ISSUES OF THE PREVIOUS KIND
+(THE HIGHLIGHTER SHOULD TURN OFF ITALICS
+AND BOLD FOR PARTS OF THE LINE)
+
+the "blank" line has a hax..
+
+_hello
+ 
+goodbye_
+
+_it *bo _it al_ ld* al_
+
+*bo _it *bo ld* al_ ld*
+
+_hello *goodbye_* hello* goodbye
 

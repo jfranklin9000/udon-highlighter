@@ -4,6 +4,7 @@
 UDONS = \
 	static-site/headers.udon \
 	static-site/italics-bold.udon \
+	static-site/escape.udon \
 	static-site/misc.udon \
 	static-site/README.udon
 
