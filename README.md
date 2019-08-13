@@ -2,137 +2,78 @@
 
 Udon Syntax Highlighter Bounty
 
-### Preliminaries
-
-I put all my Urbit stuff in `~/URBIT`.
+### Clone repository
 
 ```
-    cd ~/URBIT/
-    git clone https://github.com/jfranklin9000/udon-highlighter.git
+git clone https://github.com/jfranklin9000/udon-highlighter.git
+cd udon-highlighter
 ```
 
-### Build Urbit
+### Create a fake `zod` in `udon-highlighter/`
 
 ```
-    cd ~/URBIT/urbit-master
-    git pull
-```
-```
-remote: Enumerating objects: 654, done.
-remote: Counting objects: 100% (654/654), done.
-remote: Compressing objects: 100% (67/67), done.
-remote: Total 933 (delta 596), reused 640 (delta 586), pack-reused 279
-Receiving objects: 100% (933/933), 1.94 MiB | 710.00 KiB/s, done.
-Resolving deltas: 100% (700/700), completed with 159 local objects.
-From https://github.com/urbit/urbit
-   ab562348e..ab1f70ef4  master                      -> origin/master
-   ae01030e5..626f7c9a7  alef-testnet                -> origin/alef-testnet
-   b2e9afed2..753c9ef17  bs/uterm                    -> origin/bs/uterm
- * [new branch]          fix-zero-sized-capped-queue -> origin/fix-zero-sized-capped-queue
-   03da8b40f..c253ed2a8  philip/kale                 -> origin/philip/kale
-   a7c6f0ce1..aa0276cef  safe-prototype              -> origin/safe-prototype
- * [new branch]          stage-solid-redux           -> origin/stage-solid-redux
-First, rewinding head to replay your work on top of it...
-Applying: make udon inline code match block code and enable inline code gaps in Publish app
-Applying: modify udon parser to preserve gaps in inline code blocks
-```
-```
-    git log
-```
-```
-commit 3c6bbae25f7d5991c0ed93c05cfd278fcc530a84 (HEAD -> master)
-Author: John Franklin <jfranklin9000@gmail.com>
-Date:   Mon Aug 5 03:51:35 2019 -0500
-
-    modify udon parser to preserve gaps in inline code blocks
-
-commit 7bda2fb6f4b535d112fa9eef833e6304e9ccd508
-Author: John Franklin <jfranklin9000@gmail.com>
-Date:   Mon Aug 5 02:30:06 2019 -0500
-
-    make udon inline code match block code and enable inline code gaps in Publish app
-
-commit ab1f70ef49112e9ee42dc13f4dab55d6d2cb5c27 (origin/master, origin/HEAD)
-Merge: cb778c79f 68d9acae5
-Author: Elliot Glaysher <elliot@tlon.io>
-Date:   Tue Aug 6 16:10:49 2019 -0700
-
-    Merge pull request #1433 from urbit/fix-zero-sized-capped-queue
-
-    Fix capped queues to not crash when the size is set to 0.
-```
-```
-    make install
-    ls -l `which urbit` | cut -d '>' -f 2 | cut -c 2-1000
-```
-```
-/nix/store/pqwxf5bsjk1sij9lxsq5kp80bv1w05qy-urbit/bin/urbit
-```
-```
-    urbit -R
-```
-```
-urbit 0.8.1
-gmp: 6.1.2
-sigsegv: 2.12
-openssl: OpenSSL 1.0.2p  14 Aug 2018
-curses: ncurses 6.1.20181027
-libuv: 1.9.1
-libh2o: 0.13.5
-lmdb: 0.9.22
-curl: 7.62.0
-argon2: 0x13
+urbit -F zod
 ```
 
-### Make a fake `zod`
+### Mount the `%home` desk
 
 ```
-    cd ~/URBIT/udon-highlighter
-    urbit -A pkg/arvo -F zod
+|mount /=home=
 ```
 
-We want commits `7bda2fb6f4b535d112fa9eef833e6304e9ccd508` and
-`3c6bbae25f7d5991c0ed93c05cfd278fcc530a84` hence the `-A pkg/arvo`. 
+### Link `static-site/` into `%home` desk
 
 ```
-    |mount /=home=
+mkdir -p zod/home/web
+ln -s `pwd`/static-site zod/home/web/static-site
 ```
 
-Append the following to `home/app/publish/css/index.css` _(optional)_:
+### Populate `static-site/` from `snips/`
+
+`snips/*.snip` are the udon sources.
 
 ```
-code {
-  padding: 8px;
-  background-color: #f9f9f9;
-  white-space: pre-wrap;
-}
+make
 ```
 
-From the shell:
+### Parse the udons
 
 ```
-    # populate static-site from snips
-    make
-    # link static-site into home desk
-    mkdir -p zod/home/web
-    ln -s `pwd`/static-site zod/home/web/static-site
+|commit %home
+|static
 ```
 
-From the dojo:
+### Post-process the udon parser output (idempotent)
 
 ```
-    |commit %home
-    |static
+make css
 ```
 
-From the shell:
+The final html files are in `iframes/`.
+The `iframes/` files combine the files
+in `cms/` and `rendered/` in iframes.
+
+### Iteration
+
+Edit a `.snip` or create a new one in `snips/`.
+If you create a new `.snip` add it to the `Makefile`.
 
 ```
-    ln -s zod/.urb/put/web/static-site rendered
-    ls rendered/
+make
+|commit %home
+|static
+make css
 ```
 
-## QUESTIONS
+### Reset
+
+```
+make clean
+```
+
+This deletes the files in `static-site/`, `rendered/`, `cms/` and `iframes/`.
+
+## Questions
 
 - Should we fail gracefully?
 
@@ -142,5 +83,23 @@ From the shell:
   The parser doesn't now; I guess the "actual text"
   can start with spaces.
 
-- lineIsEmpty(line) => empty or _whitespace only_
+- lineIsEmpty(line) => empty or _whitespace only_.
   What about udon parser?
+
+
+#### Miscellaneous
+
+Had a `zod` that was read-only and tried to start it:
+
+```
+urbit 0.8.1
+boot: home is /Volumes/sensitive/URBIT/udon-highlighter/zod
+loom: mapped 2048MB
+lite: arvo formula 99d9974
+lite: core 717aac08
+lite: final state 717aac08
+loom: mapped 2048MB
+address 0x68 out of loom!
+loom: [0x200000000 : 0x280000000)
+Assertion '0' failed in noun/events.c:129
+```

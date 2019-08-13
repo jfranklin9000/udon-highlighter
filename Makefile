@@ -14,10 +14,7 @@ css:
 	php css.php
 
 clean:
-	rm -f static-site/*.udon
-
-clean-rendered:
-	rm -f rendered/*
+	rm -f static-site/* rendered/* cms/* iframes/*
 
 static-site/%.udon: snips/%.snip
 	php snip.php $< > $@
