@@ -14,11 +14,19 @@ css:
 	php css.php
 
 clean:
-	rm static-site/*.udon
+	rm -f static-site/*.udon
+
+clean-rendered:
+	rm -f rendered/*
 
 static-site/%.udon: snips/%.snip
 	php snip.php $< > $@
+	php cm.php $< > cms/$*.html
+	php iframe.php $* > iframes/$*.html
 
 # what the heck, send markdown through the udon parser
 static-site/README.udon: README.md
-	php snip.php $< > $@
+	echo ";>\n\n" > static-site/README.udon
+	cat README.md >> static-site/README.udon
+	php cm.php README.md > cms/README.html
+	php iframe.php README > iframes/README.html

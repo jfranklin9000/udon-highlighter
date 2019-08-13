@@ -141,3 +141,6 @@ From the shell:
   Do we want to enforce a single space?
   The parser doesn't now; I guess the "actual text"
   can start with spaces.
+
+- lineIsEmpty(line) => empty or _whitespace only_
+  What about udon parser?

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+p {
+  margin: 30px;
+}
+
+.header {
+  position: absolute;
+  top: 0;
+  bottom: 80px;                                         /* see .content:top */
+  left: 0;
+  right: 0;
+  background: lightgray;
+}
+
+.content {
+  position: absolute;
+  top: 80px;                                            /* see .header:bottom */
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+}
+
+.content .udon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 100%;
+  width: 50%;
+  border: 0;
+}
+
+.content .html {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  height: 100%;
+  width: 50%;
+  border: 0;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+  <p><b>NOTE:</b> Editing in the highlighter <b>is not</b> reflected in the rendered Udon.</p>
+
+</div>
+
+<div class="content">
+
+  <iframe class="udon" src="../cms/THE-SNIP.html"></iframe>
+
+  <iframe class="html" src="../rendered/THE-SNIP.html"></iframe>
+
+</div>
+
+</body>
+
+</html>
