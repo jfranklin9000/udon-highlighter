@@ -5,20 +5,12 @@
 <meta charset="utf-8"/>
 <script src="../CodeMirror/lib/codemirror.js"></script>
 <link rel="stylesheet" href="../CodeMirror/lib/codemirror.css">
+<script src="../CodeMirror/mode/udon/udon.js"></script>
 <style>
 body { background: #bbb; }
 </style>
-<!-- -->
-<script src="../udon.js"></script>
-<!-- -->
-<!--
-<script src="../CodeMirror/mode/udon/udon.js"></script>
--->
 </head>
 <body>
-<!--
-<div id="udon"></div>
--->
 <textarea id="udon">THE-SNIP</textarea>
 <script>
 var udon = CodeMirror.fromTextArea(document.getElementById("udon"), { mode: "udon" });

@@ -3,15 +3,13 @@
 	if (($files = scandir('rendered')) === false)
 		exit("scandir() returned FALSE\n");
 
-	$udon_js = false ? "../CodeMirror/mode/udon/udon.js" : "../udon.js";
-
 	$head =
 "<head>
 	<title>Udon Syntax Highlighter</title>
 	<meta charset=\"utf-8\"/>
 	<script src=\"../CodeMirror/lib/codemirror.js\"></script>
 	<link rel=\"stylesheet\" href=\"../CodeMirror/lib/codemirror.css\">
-	<script src=\"$udon_js\"></script>
+	<script src=\"../CodeMirror/mode/udon/udon.js\"></script>
 	<style>
 	body {
 		background: #fff;
@@ -24,6 +22,10 @@
 		background: #eee;
 		padding: 6px;
 		white-space: pre-wrap;
+	}
+	blockquote {
+		background: antiquewhite;
+		padding: 6px;
 	}
 	</style>
 </head>";
