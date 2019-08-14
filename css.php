@@ -13,19 +13,27 @@
 	<style>
 	body {
 		background: #fff;
+		line-height: 2.0em;
+		font-family: \"Trebuchet MS\", Arial, Helvetica, sans-serif;
 	}
 	pre {
 		background: #eee;
 		padding: 6px;
+		line-height: 1.5em;
+		font-size: larger;
 	}
 	code {
-		background: #eee;
+		background: #e94;		/* #a50 in highlighter */ /* #eee; */
 		padding: 6px;
 		white-space: pre-wrap;
+		font-size: larger;
 	}
 	blockquote {
-		background: antiquewhite;
+		background: #aca;		/* #090 in highlighter */
 		padding: 6px;
+	}
+	a {
+		color: inherit;
 	}
 	</style>
 </head>";
