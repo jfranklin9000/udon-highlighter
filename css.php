@@ -23,7 +23,7 @@
 		font-size: larger;
 	}
 	code {
-		background: #e94;		/* #a50 in highlighter */ /* #eee; */
+		background: #eee;		/* #e94; */ /* #a50 in highlighter */
 		padding: 6px;
 		white-space: pre-wrap;
 		font-size: larger;
