@@ -4,6 +4,8 @@ Udon Syntax Highlighter Bounty
 
 ### Clone repository
 
+_*make the repository public*_
+
 ```
 git clone https://github.com/jfranklin9000/udon-highlighter.git
 cd udon-highlighter
