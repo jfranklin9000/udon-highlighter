@@ -83,23 +83,9 @@ This deletes the files in `static-site/`, `rendered/`, `cms/` and `iframes/`.
   The parser doesn't now; I guess the "actual text"
   can start with spaces.
 
-- lineIsEmpty(line) => empty or _whitespace only_.
+- `lineIsEmpty(line)` => empty or _whitespace only_.
   What about udon parser?
 
+### Miscellaneous
 
-#### Miscellaneous
-
-Had a `zod` that was read-only and tried to start it:
-
-```
-urbit 0.8.1
-boot: home is /Volumes/sensitive/URBIT/udon-highlighter/zod
-loom: mapped 2048MB
-lite: arvo formula 99d9974
-lite: core 717aac08
-lite: final state 717aac08
-loom: mapped 2048MB
-address 0x68 out of loom!
-loom: [0x200000000 : 0x280000000)
-Assertion '0' failed in noun/events.c:129
-```
+- requires command line `php`

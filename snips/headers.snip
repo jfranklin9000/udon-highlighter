@@ -12,20 +12,28 @@
 
 ###### header 6
 
-> parser error, so showing as inline code \
+> parser error so prefix with $\
   delete $ to see highlighter handling
 
 $####### not a header 7
 
 -- -- -- --
 
-> not a header - hax only
+> hax ace eol - header - look at DOM to see `<h3 id=""></h3>`
+
+# 
+
+> hax eol - not a header
 
 #
 
-> header - hax ace - look at DOM to see `<h3 id=""></h3>`
+> ace hax eol - not a header, or parser error?\
+  highlighter says not a header\
+  parser says parser error `%indent-pattern-violation`\
+  XX fix me\
+  delete $ to see highlighter handling
 
-# 
+$ #
 
 -- -- -- --
 
