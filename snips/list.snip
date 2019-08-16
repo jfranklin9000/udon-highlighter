@@ -12,3 +12,93 @@
 
 + items
 
+-- -- -- --
+
+-not an unordered list item
+
++not an ordered list item
+
+> parser error `%indent-pattern-violation %bloc` so prefix with $\
+  delete $ to see highlighter handling
+
+> these show as list items in the highlighter - XX fix me
+
+$ - not an unordered list item
+
+$ + not an ordered list item
+
+-- -- -- --
+
+> `%bad-block-structure %lime`
+
+$- hello
+goodbye
+
+> `%bad-block-structure %lime` if remove both $\
+  `%columns-advanced` if only second removed
+
+$- hello
+$ goodbye
+
+- hello
+  goodbye
+
+> %bad-block-structure %lime
+
+$+ hello
+goodbye
+
+> `%bad-block-structure %lime` if remove both $\
+  `%columns-advanced` if only second removed
+
+$+ hello
+$ goodbye
+
++ hello
+  goodbye
+
+-- -- -- --
+
+- Eggs
+  (cage-free)
+- Milk
+- Butter
+- Chicken\
+  Make sure that you get enough for the barbecue
+- Bread
+  + Ask the baker what's fresh
+  + Buy the second-freshest batch
+- Cereal
+
+\
++ First, separate eggs into a bowl.
++ Then, add a splash of cream.
+  - If you don't have cream, you can use milk, but cream is preferred.
+    + If you don't have milk or cream, melt an eighth of a stick of butter on
+      a skillet
+    + Scrambled the eggs in the bowl.
+    + Pour the eggs onto the skillet before the butter browns
++ Heat the skillet
+
++ Scramble eggs and put them into skillet
+
+\
++ Cool
++ Alright
+
+-- -- -- --
+
+- does
+  - this
+    - work?
+      - what html entity is next?
+      - hmm, highlighter colors as solid dot\
+        parser shows as solid square\
+        what does markdown parser do?
+
++ does
+  + this
+    + work?
+      + one?
+      + yes, this item two
+
