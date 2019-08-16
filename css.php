@@ -21,6 +21,7 @@
 		padding: 6px;
 		line-height: 1.5em;
 		font-size: larger;
+		overflow-x: scroll;
 	}
 	code {
 		background: #eee;		/* #e94; */ /* #a50 in highlighter */
