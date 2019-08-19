@@ -1,4 +1,38 @@
 
 
-Block Quote
+> As Gregor Samsa awoke one morning from uneasy dreams, he
+  found himself transformed in his bed into a *monstrous* vermin.
+
+Quote break.
+
+> _See_ the child.
+
+  He is pale and thin, he wears a thin and ragged linen shirt.
+
+-- -- -- --
+
+The docs say inline italicization with `_` doesn't work.
+(What about `*`?)
+
+The docs, being markdown, do show the italicization.
+(Fix the docs.) (Actually, the udon parser does show the
+italicization.)
+
+"Blank newlines do not end the block quote, but a blank newline
+followed by an unindented line of text will end the quote."
+(The markdown needs to simulate udon here.)
+
+-- -- -- --
+
+> block quote
+
+  more block quote
+
+\  > indented block quote
+
+\    more indented block quote
+
+\    >  indented block quote
+
+\       more indented block quote
 
