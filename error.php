@@ -8,7 +8,7 @@ Above the line
 ---
 Below the line
 -----
-And below this line, too";
+And below this	line, too";
 
 	// error position (1-based)
 	$lin = 6;
@@ -45,6 +45,9 @@ And below this line, too";
 	// package it up
 	$udon = implode("\n", $lines);
 
+	// highlight tabs (XX add to highlighter too)
+	$udon = str_replace("\t", "<span class=\"tab\">\t</span>", $udon);
+
 ?>
 <!doctype html>
 <html>
@@ -54,6 +57,7 @@ And below this line, too";
       .ok { color: black; }
    /* .err { color: red; background: lightgray; } */
       .err { color: black; background: salmon; }
+      .tab { background: red; }
     </style>
   </head>
   <body>
