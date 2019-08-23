@@ -2,6 +2,7 @@
 // Distributed under an MIT license: https://codemirror.net/LICENSE
 
 (function(mod) {
+// do we need ../xml/xml ? ~udon
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../meta"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -13,18 +14,6 @@
 
 CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
-  var htmlMode = CodeMirror.getMode(cmCfg, "text/html");
-  var htmlModeMissing = htmlMode.name == "null"
-
-  function getMode(name) {
-    if (CodeMirror.findModeByName) {
-      var found = CodeMirror.findModeByName(name);
-      if (found) name = found.mime || found.mimes[0];
-    }
-    var mode = CodeMirror.getMode(cmCfg, name);
-    return mode.name == "null" ? null : mode;
-  }
-
   // Should characters that affect highlighting be highlighted separate?
   // Does not include characters that will be output (such as `1.` and `-` for lists)
   if (modeCfg.highlightFormatting === undefined)
@@ -34,22 +23,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   // Excess `>` will emit `error` token.
   if (modeCfg.maxBlockquoteDepth === undefined)
     modeCfg.maxBlockquoteDepth = 0;
-
-  // Turn on task lists? ("- [ ] " and "- [x] ")
-  if (modeCfg.taskLists === undefined) modeCfg.taskLists = false;
-
-  // Turn on strikethrough syntax
-  if (modeCfg.strikethrough === undefined)
-    modeCfg.strikethrough = false;
-
-  if (modeCfg.emoji === undefined)
-    modeCfg.emoji = false;
-
-  if (modeCfg.fencedCodeBlockHighlighting === undefined)
-    modeCfg.fencedCodeBlockHighlighting = true;
-
-  if (modeCfg.xml === undefined)
-    modeCfg.xml = true;
 
   // Allow token types to be overridden by user-provided token types.
   if (modeCfg.tokenTypeOverrides === undefined)
@@ -72,9 +45,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     linkText: "link",
     linkHref: "string",
     em: "em",
-    strong: "strong",
-    strikethrough: "strikethrough",
-    emoji: "builtin"
+    strong: "strong"
   };
 
   for (var tokenType in tokenTypes) {
@@ -87,23 +58,28 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   var
       // changed - don't use * or _ as horizontal rule
 //    hrRE = /^([*\-_])(?:\s*\1){2,}\s*$/ // markdown
-      hrRE = /^(\-)(?:\s*\1){2,}\s*$/
+      hrRE = /^(\-)(?:\s*\1){2,}\s*$/     // udon
+      //
       // changed - don't use * as list item
 //,   listRE = /^(?:[*\-+]|^[0-9]+([.)]))\s+/ // markdown
-  ,   listRE = /^(?:[\-+]|^[0-9]+([.)]))\s+/
-      // no change, but not used
-  ,   taskListRE = /^\[(x| )\](?=\s)/i // Must follow listRE
+  ,   listRE = /^(?:[\-+]|^[0-9]+([.)]))\s+/  // udon
+      //
       // changed - require at least one space to be a header
-//,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: |$)/ // markdown
-//,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: (?! ))/ // only one space
-  ,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: )/ // at least one space
+//,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: |$)/    // markdown
+//,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: (?! ))/ // udon - only one space
+  ,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: )/      // udon - at least one space
+      //
       // changed - don't allow === or --- to headerize the previous line
 //,   setextHeaderRE = /^ *(?:\={1,}|-{1,})\s*$/ // markdown
-  ,   setextHeaderRE = /(?!)/ // matches nothing
+  ,   setextHeaderRE = /(?!)/                    // udon - matches nothing
+      //
       // no change
   ,   textRE = /^[^#!\[\]*_\\<>` "'(~:]+/
-      // no change yet - don't allow ~~~/tabs/spaces for code fencing
-  ,   fencedCodeRE = /^(~~~+|```+)[ \t]*([\w+#-]*)[^\n`]*$/
+      //
+      // changed - don't allow ~~~ for code fencing
+//,   fencedCodeRE = /^(~~~+|```+)[ \t]*([\w+#-]*)[^\n`]*$/ // markdown
+  ,   fencedCodeRE = /^(```)(.*)$/                          // udon - match more than ``` so we can error on ```json
+      //
       // no change
   ,   linkDefRE = /^\s*\[[^\]]+?\]:.*$/ // naive link-definition
       // no change
@@ -129,6 +105,13 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   // Blocks
 
   function blankLine(state) {
+//console.log('blankLine.state.quote', state.quote);
+// ~udon - XX move down?
+// udon can have blank lines
+// without breaking the quote
+// doesn't quite work
+//if (state.quote)
+//  return null;
     // Reset udonParseError state
     state.udonParseError = false; // ~udon
     // Reset linkTitle state
@@ -141,25 +124,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     state.strong = false;
     // Reset lastEmOrStrong state
     state.lastEmOrStrong = null; // ~udon
-    // Reset strikethrough state
-    state.strikethrough = false;
     // Reset state.quote
     state.quote = 0;
     // Reset state.indentedCode
     state.indentedCode = false;
-    if (state.f == htmlBlock) {
-      var exit = htmlModeMissing
-      if (!exit) {
-        var inner = CodeMirror.innerMode(htmlMode, state.htmlState)
-        exit = inner.mode.name == "xml" && inner.state.tagStart === null &&
-          (!inner.state.context && inner.state.tokenize.isInText)
-      }
-      if (exit) {
-        state.f = inlineNormal;
-        state.block = blockNormal;
-        state.htmlState = null;
-      }
-    }
     // Reset state.trailingSpace
     state.trailingSpace = 0;
     state.trailingSpaceNewLine = false;
@@ -189,7 +157,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         state.strong = false;
         state.lastEmOrStrong = null; // ~udon
         state.code = false;
-        state.strikethrough = false;
 
         state.list = null;
         // While this list item's marker's indentation is less than the deepest
@@ -253,18 +220,16 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       // Add this list item's content's indentation to the stack
       state.listStack.push(state.indentation);
 
-      if (modeCfg.taskLists && stream.match(taskListRE, false)) {
-        state.taskList = true;
-      }
       state.f = state.inline;
       if (modeCfg.highlightFormatting) state.formatting = ["list", "list-" + listType];
       return getType(state);
     } else if (firstTokenOnLine && state.indentation <= maxNonCodeIndentation && (match = stream.match(fencedCodeRE, true))) {
+      state.udonParseError = (stream.column() != 0) || (match[2].length > 0); // ~udon - XX what about indentation?
       state.quote = 0;
-      state.fencedEndRE = new RegExp(match[1] + "+ *$");
+// ~udon
+//    state.fencedEndRE = new RegExp(match[1] + "+ *$"); // markdown
+      state.fencedEndRE = fencedCodeRE;                  // udon
       // try switching mode
-      state.localMode = modeCfg.fencedCodeBlockHighlighting && getMode(match[2]);
-      if (state.localMode) state.localState = CodeMirror.startState(state.localMode);
       state.f = state.block = local;
       if (modeCfg.highlightFormatting) state.formatting = "code-block";
       state.code = -1
@@ -298,37 +263,22 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.hr = true;
       state.thisLine.hr = true;
       return tokenTypes.hr;
-    } else if (stream.peek() === '[') {
-      return switchInline(stream, state, footnoteLink);
     }
 
     return switchInline(stream, state, state.inline);
-  }
-
-  function htmlBlock(stream, state) {
-    var style = htmlMode.token(stream, state.htmlState);
-    if (!htmlModeMissing) {
-      var inner = CodeMirror.innerMode(htmlMode, state.htmlState)
-      if ((inner.mode.name == "xml" && inner.state.tagStart === null &&
-           (!inner.state.context && inner.state.tokenize.isInText)) ||
-          (state.md_inside && stream.current().indexOf(">") > -1)) {
-        state.f = inlineNormal;
-        state.block = blockNormal;
-        state.htmlState = null;
-      }
-    }
-    return style;
   }
 
   function local(stream, state) {
     var currListInd = state.listStack[state.listStack.length - 1] || 0;
     var hasExitedList = state.indentation < currListInd;
     var maxFencedEndInd = currListInd + 3;
-    if (state.fencedEndRE && state.indentation <= maxFencedEndInd && (hasExitedList || stream.match(state.fencedEndRE))) {
+    var match; // ~udon
+//  if (state.fencedEndRE && state.indentation <= maxFencedEndInd && (hasExitedList || stream.match(state.fencedEndRE))) {
+    if (state.fencedEndRE && state.indentation <= maxFencedEndInd && (hasExitedList || (match = stream.match(state.fencedEndRE)))) { // ~udon
+      state.udonParseError = (stream.column() != 0) || (match[2].length > 0); // ~udon - XX what about indentation? hasExitedList?
       if (modeCfg.highlightFormatting) state.formatting = "code-block";
       var returnType;
       if (!hasExitedList) returnType = getType(state)
-      state.localMode = state.localState = null;
       state.block = blockNormal;
       state.f = inlineNormal;
       state.fencedEndRE = null;
@@ -336,8 +286,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.thisLine.fencedCodeEnd = true;
       if (hasExitedList) return switchBlock(stream, state, state.block);
       return returnType;
-    } else if (state.localMode) {
-      return state.localMode.token(stream, state.localState);
     } else {
       stream.skipToEnd();
       return tokenTypes.code;
@@ -376,22 +324,11 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       }
     }
 
-    if (state.taskOpen) {
-      styles.push("meta");
-      return styles.length ? styles.join(' ') : null;
-    }
-    if (state.taskClosed) {
-      styles.push("property");
-      return styles.length ? styles.join(' ') : null;
-    }
-
     if (state.linkHref) {
       styles.push(tokenTypes.linkHref, "url");
     } else { // Only apply inline styles to non-url text
       if (state.strong) { styles.push(tokenTypes.strong); }
       if (state.em) { styles.push(tokenTypes.em); }
-      if (state.strikethrough) { styles.push(tokenTypes.strikethrough); }
-      if (state.emoji) { styles.push(tokenTypes.emoji); }
       if (state.linkText) { styles.push(tokenTypes.linkText); }
       if (state.code) { styles.push(tokenTypes.code); }
       if (state.image) { styles.push(tokenTypes.image); }
@@ -449,18 +386,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.list = null;
       return getType(state);
     }
-
-    if (state.taskList) {
-      var taskOpen = stream.match(taskListRE, true)[1] === " ";
-      if (taskOpen) state.taskOpen = true;
-      else state.taskClosed = true;
-      if (modeCfg.highlightFormatting) state.formatting = "task";
-      state.taskList = false;
-      return getType(state);
-    }
-
-    state.taskOpen = false;
-    state.taskClosed = false;
 
     if (state.header && stream.match(/^#+$/, true)) {
       if (modeCfg.highlightFormatting) state.formatting = "header";
@@ -575,21 +500,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       return type + tokenTypes.linkEmail;
     }
 
-    if (modeCfg.xml && ch === '<' && stream.match(/^(!--|\?|!\[CDATA\[|[a-z][a-z0-9-]*(?:\s+[a-z_:.\-]+(?:\s*=\s*[^>]+)?)*\s*(?:>|$))/i, false)) {
-      var end = stream.string.indexOf(">", stream.pos);
-      if (end != -1) {
-        var atts = stream.string.substring(stream.start, end);
-        if (/markdown\s*=\s*('|"){0,1}1('|"){0,1}/.test(atts)) state.md_inside = true;
-      }
-      stream.backUp(1);
-      state.htmlState = CodeMirror.startState(htmlMode);
-      return switchBlock(stream, state, htmlBlock);
-    }
-
-    if (modeCfg.xml && ch === '<' && stream.match(/^\/\w*?>/)) {
-      state.md_inside = false;
-      return "tag";
-    } else if (ch === "*" || ch === "_") {
+    if (ch === "*" || ch === "_") {
 /* ~udon toss
       var len = 1, before = stream.pos == 1 ? " " : stream.string.charAt(stream.pos - 2)
       while (len < 3 && stream.eat(ch)) len++
@@ -653,37 +564,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
           stream.backUp(1);
         }
       }
-    }
-
-    if (modeCfg.strikethrough) {
-      if (ch === '~' && stream.eatWhile(ch)) {
-        if (state.strikethrough) {// Remove strikethrough
-          if (modeCfg.highlightFormatting) state.formatting = "strikethrough";
-          var t = getType(state);
-          state.strikethrough = false;
-          return t;
-        } else if (stream.match(/^[^\s]/, false)) {// Add strikethrough
-          state.strikethrough = true;
-          if (modeCfg.highlightFormatting) state.formatting = "strikethrough";
-          return getType(state);
-        }
-      } else if (ch === ' ') {
-        if (stream.match(/^~~/, true)) { // Probably surrounded by space
-          if (stream.peek() === ' ') { // Surrounded by spaces, ignore
-            return getType(state);
-          } else { // Not surrounded by spaces, back up pointer
-            stream.backUp(2);
-          }
-        }
-      }
-    }
-
-    if (modeCfg.emoji && ch === ":" && stream.match(/^(?:[a-z_\d+][a-z_\d+-]*|\-[a-z_\d+][a-z_\d+-]*):/)) {
-      state.emoji = true;
-      if (modeCfg.highlightFormatting) state.formatting = "emoji";
-      var retType = getType(state);
-      state.emoji = false;
-      return retType;
     }
 
     if (ch === ' ') {
@@ -755,48 +635,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     };
   }
 
-  function footnoteLink(stream, state) {
-    if (stream.match(/^([^\]\\]|\\.)*\]:/, false)) {
-      state.f = footnoteLinkInside;
-      stream.next(); // Consume [
-      if (modeCfg.highlightFormatting) state.formatting = "link";
-      state.linkText = true;
-      return getType(state);
-    }
-    return switchInline(stream, state, inlineNormal);
-  }
-
-  function footnoteLinkInside(stream, state) {
-    if (stream.match(/^\]:/, true)) {
-      state.f = state.inline = footnoteUrl;
-      if (modeCfg.highlightFormatting) state.formatting = "link";
-      var returnType = getType(state);
-      state.linkText = false;
-      return returnType;
-    }
-
-    stream.match(/^([^\]\\]|\\.)+/, true);
-
-    return tokenTypes.linkText;
-  }
-
-  function footnoteUrl(stream, state) {
-    // Check if space, and return NULL if so (to avoid marking the space)
-    if(stream.eatSpace()){
-      return null;
-    }
-    // Match URL
-    stream.match(/^[^\s]+/, true);
-    // Check for link title
-    if (stream.peek() === undefined) { // End of line, set flag to check next line
-      state.linkTitle = true;
-    } else { // More content on line, check if link title
-      stream.match(/^(?:\s+(?:"(?:[^"\\]|\\\\|\\.)+"|'(?:[^'\\]|\\\\|\\.)+'|\((?:[^)\\]|\\\\|\\.)+\)))?/, true);
-    }
-    state.f = state.inline = inlineNormal;
-    return tokenTypes.linkHref + " url";
-  }
-
   var mode = {
     startState: function() {
       return {
@@ -809,7 +647,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         udonParseError: false, // ~udon
 
         block: blockNormal,
-        htmlState: null,
         indentation: 0,
 
         inline: inlineNormal,
@@ -827,14 +664,11 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         header: 0,
         setext: 0,
         hr: false,
-        taskList: false,
         list: false,
         listStack: [],
         quote: 0,
         trailingSpace: 0,
         trailingSpaceNewLine: false,
-        strikethrough: false,
-        emoji: false,
         fencedEndRE: null
       };
     },
@@ -849,11 +683,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         udonParseError: s.udonParseError, // ~udon
 
         block: s.block,
-        htmlState: s.htmlState && CodeMirror.copyState(htmlMode, s.htmlState),
         indentation: s.indentation,
-
-        localMode: s.localMode,
-        localState: s.localMode ? CodeMirror.copyState(s.localMode, s.localState) : null,
 
         inline: s.inline,
         text: s.text,
@@ -865,19 +695,15 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         em: s.em,
         strong: s.strong,
         lastEmOrStrong: s.lastEmOrStrong, // ~udon
-        strikethrough: s.strikethrough,
-        emoji: s.emoji,
         header: s.header,
         setext: s.setext,
         hr: s.hr,
-        taskList: s.taskList,
         list: s.list,
         listStack: s.listStack.slice(0),
         quote: s.quote,
         indentedCode: s.indentedCode,
         trailingSpace: s.trailingSpace,
         trailingSpaceNewLine: s.trailingSpaceNewLine,
-        md_inside: s.md_inside,
         fencedEndRE: s.fencedEndRE
       };
     },
@@ -899,16 +725,13 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         state.prevLine = state.thisLine
         state.thisLine = {stream: stream}
 
-        // Reset state.taskList
-        state.taskList = false;
-
         // Reset state.trailingSpace
         state.trailingSpace = 0;
         state.trailingSpaceNewLine = false;
 
-        if (!state.localState) {
+        if (true) {
           state.f = state.block;
-          if (state.f != htmlBlock) {
+          if (true) {
             var indentation = stream.match(/^\s*/, true)[0].replace(/\t/g, expandedTab).length;
             state.indentation = indentation;
             state.indentationDiff = null;
@@ -920,14 +743,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     },
 
     innerMode: function(state) {
-      if (state.block == htmlBlock) return {state: state.htmlState, mode: htmlMode};
-      if (state.localState) return {state: state.localState, mode: state.localMode};
       return {state: state, mode: mode};
     },
 
     indent: function(state, textAfter, line) {
-      if (state.block == htmlBlock && htmlMode.indent) return htmlMode.indent(state.htmlState, textAfter, line)
-      if (state.localState && state.localMode.indent) return state.localMode.indent(state.localState, textAfter, line)
       return CodeMirror.Pass
     },
 
