@@ -40,8 +40,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     imageAltText: "image-alt-text",
     imageMarker: "image-marker",
     formatting: "formatting",
-    linkInline: "link",
-    linkEmail: "link",
     linkText: "link",
     linkHref: "string",
     em: "em",
@@ -60,9 +58,9 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 //    hrRE = /^([*\-_])(?:\s*\1){2,}\s*$/ // markdown
       hrRE = /^(\-)(?:\s*\1){2,}\s*$/     // udon
       //
-      // changed - don't use * as list item
+      // changed - don't use * or 1. as list item
 //,   listRE = /^(?:[*\-+]|^[0-9]+([.)]))\s+/ // markdown
-  ,   listRE = /^(?:[\-+]|^[0-9]+([.)]))\s+/  // udon
+  ,   listRE = /^([\-+]) \n?/                 // udon - capture the hep or lus
       //
       // changed - require at least one space to be a header, and hax newline is not a header
 //,   atxHeaderRE = modeCfg.allowAtxHeaderWithoutSpace ? /^(#+)/ : /^(#+)(?: |$)/ // markdown
@@ -97,13 +95,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   // Blocks
 
   function blankLine(state) {
-//console.log('blankLine.state.quote', state.quote);
-// ~udon - XX move down?
-// udon can have blank lines
-// without breaking the quote
-// doesn't quite work
-//if (state.quote)
-//  return null;
     // Reset udonParseError state
     state.udonParseError = false; // ~udon
     // Reset linkHref state
@@ -196,7 +187,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       stream.eatSpace();
       return getType(state);
     } else if (!isHr && firstTokenOnLine && state.indentation <= maxNonCodeIndentation && (match = stream.match(listRE))) {
-      var listType = match[1] ? "ol" : "ul";
+      var listType = (match[1] == '+') ? "ol" : "ul";
 
       state.indentation = lineIndentation + stream.current().length;
       state.list = true;
@@ -342,8 +333,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (typeof style !== 'undefined')
       return style;
 
-// no * for ~udon
-    if (state.list) { // List marker (*, +, -, 1., etc)
+    if (state.list) { // List marker (+ or -)
       state.list = null;
       return getType(state);
     }
@@ -423,30 +413,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       return type;
     }
 
-    if (ch === '<' && stream.match(/^(https?|ftps?):\/\/(?:[^\\>]|\\.)+>/, false)) {
-      state.f = state.inline = linkInline;
-      if (modeCfg.highlightFormatting) state.formatting = "link";
-      var type = getType(state);
-      if (type){
-        type += " ";
-      } else {
-        type = "";
-      }
-      return type + tokenTypes.linkInline;
-    }
-
-    if (ch === '<' && stream.match(/^[^> \\]+@(?:[^\\>]|\\.)+>/, false)) {
-      state.f = state.inline = linkInline;
-      if (modeCfg.highlightFormatting) state.formatting = "link";
-      var type = getType(state);
-      if (type){
-        type += " ";
-      } else {
-        type = "";
-      }
-      return type + tokenTypes.linkEmail;
-    }
-
     if (ch === "*" || ch === "_") {
 // ~udon start
       var setEm = null, setStrong = null
@@ -494,26 +460,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     return getType(state);
   }
 
-  function linkInline(stream, state) {
-    var ch = stream.next();
-
-    if (ch === ">") {
-      state.f = state.inline = inlineNormal;
-      if (modeCfg.highlightFormatting) state.formatting = "link";
-      var type = getType(state);
-      if (type){
-        type += " ";
-      } else {
-        type = "";
-      }
-      return type + tokenTypes.linkInline;
-    }
-
-    stream.match(/^[^>]+/, true);
-
-    return tokenTypes.linkInline;
-  }
-
   function linkHref(stream, state) {
     // Check if space, and return NULL if so (to avoid marking the space)
     if(stream.eatSpace()){
@@ -526,7 +472,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.linkHref = true;
       return getType(state);
     }
-    return 'error';
+    return "error";
   }
 
   var linkRE = {
