@@ -59,6 +59,7 @@ in `cms/` and `rendered/` in iframes.
 
 Edit a `.snip` or create a new one in `snips/`.
 If you create a new `.snip` add it to the `Makefile`.
+A `.snip` should start and end with two blank lines.
 
 ```
 make

@@ -37,17 +37,27 @@ not a horizontal rule ---
 
 not a --- horizontal rule
 
+> block
+  ---
+  quote
+
+- list
+  ---
+  item
+
 > parser error so prefix with $\
-  delete $ to see highlighter handling
+  delete $ to see highlighter handling\
+  (correctly shows error)
 
 $--- not a horizontal rule
 
 > parser error so prefix with $\
-  delete $ to see highlighter handling
+  delete $ to see highlighter handling\
+  (incorrectly shows horizontal rule - XX fix me)
 
 not a horizontal rule
 
 $ ---
 
-> the following horizontal rule is part of the snip processing, ignore
+> the following horizontal rule is from snip processing, ignore
 
