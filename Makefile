@@ -20,6 +20,7 @@ UDONS = \
 	static-site/poem.udon \
 	static-site/sail-expressions.udon \
 	static-site/misc.udon \
+	static-site/newline.udon \
 	static-site/README.udon
 
 all: $(UDONS)
@@ -40,7 +41,6 @@ static-site/index.udon: index.udon
 	cp index.udon static-site/index.udon
 
 # what the heck, send markdown through the udon parser
-# echo -e "foo" gives -e foo in the output file! wtf?
 static-site/README.udon: README.md
 	printf ";>\n\n" > static-site/README.udon
 	cat README.md >> static-site/README.udon
