@@ -44,6 +44,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     linkHref: "string",
     em: "em",
     strong: "strong",
+    string: "string", // udon
     error: "error" // udon
   };
 
@@ -138,8 +139,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     state.em = false;
     // Reset STRONG state
     state.strong = false;
-    // Reset lastEmOrStrong state
-    state.lastEmOrStrong = null; // ~udon
+    // Reset STRING state
+    state.string = false; // ~udon
+    // Reset opened EM STRONG STRING stack state
+    state.essStack = []; // ~udon
     // Reset state.quote
     state.quote = 0;
     // Reset state.trailingSpace
@@ -153,8 +156,17 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
   function blockNormal(stream, state) {
     var firstTokenOnLine = stream.column() === state.indentation;
-    var prevLineLineIsEmpty = lineIsEmpty(state.prevLine.stream);
     var prevLineIsList = state.list !== false;
+
+    // udon - headers need to be followed by a blank line;
+    //        this may be a udon parser bug, kind of like
+    //        https://github.com/urbit/urbit/issues/1558
+    //        XX this code does not catch the case of a
+    //        fenced code block that directly follows a
+    //        header.. are there more cases? - fix me
+    if (state.prevLine.header === true && !lineIsEmpty(state.thisLine.stream)) {
+      state.udonParseError = true;
+    }
 
     var lineIndentation = state.indentation;
     // compute once per line (on first token)
@@ -164,7 +176,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         // Reset inline styles which shouldn't propagate aross list items
         state.em = false;
         state.strong = false;
-        state.lastEmOrStrong = null; // ~udon
+        state.string = false; // ~udon
+        state.essStack = []; // ~udon
         state.code = false;
 
         state.list = null;
@@ -293,6 +306,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (state.linkHref) {
       styles.push(tokenTypes.linkHref, "url");
     } else { // Only apply inline styles to non-url text
+      if (state.string) { styles.push(tokenTypes.string); } // ~udon
       if (state.strong) { styles.push(tokenTypes.strong); }
       if (state.em) { styles.push(tokenTypes.em); }
       if (state.linkText) { styles.push(tokenTypes.linkText); }
@@ -440,29 +454,75 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       return type;
     }
 
-    if (ch === '*' || ch === '_') {
+    if (ch === '*' || ch === '_' || ch === '"') { // udon - '"'
 // ~udon start
-      var setEm = null, setStrong = null
-      if (ch === '_') setEm = !state.em // Em
-      else setStrong = !state.strong // Strong
+      var setEm = null, setStrong = null, setString = null
+      if (ch === '_')
+        setEm = !state.em         // Em
+      else if (ch === '*')
+        setStrong = !state.strong // Strong
+      else // '"'
+        setString = !state.string // String
+// udon - XX fix modeCfg.highlightFormatting for string
       // modeCfg.highlightFormatting (which is not enabled) may not be correct here (just move it down?)
       if (modeCfg.highlightFormatting)
         state.formatting = setEm == null ? "strong" : setStrong == null ? "em" : "strong em"
+      // pop the essStack while updating
+      // state until tokenType is popped
+      function essStackPop(tokenType)
+      {
+        while (state.essStack.length) {
+          switch (state.essStack.pop()) {
+            case tokenTypes.em:
+              // console.log('popped EM')
+              state.em = false
+              if (tokenType == tokenTypes.em)
+                return
+              break
+            case tokenTypes.strong:
+              // console.log('popped STRONG')
+              state.strong = false
+              if (tokenType == tokenTypes.strong)
+                return
+              break
+            case tokenTypes.string:
+              // console.log('popped STRING')
+              state.string = false
+              if (tokenType == tokenTypes.string)
+                return
+              break
+            // default:
+            //   console.log("essStackPop(): unknown tokenType:", tokenType)
+            //   break
+          }
+        }
+      }
+      // Em
       if (setEm === true) {
         state.em = true
-        state.lastEmOrStrong = tokenTypes.em
+        state.essStack.push(tokenTypes.em)
       } else if (setEm === false) {
-        state.em = false
-        if (state.lastEmOrStrong == tokenTypes.strong)
-          state.strong = false // turn strong off too
+        var t = getType(state) // highlight closing _
+        essStackPop(tokenTypes.em)
+        return t
       }
+      // Strong
       if (setStrong === true) {
         state.strong = true
-        state.lastEmOrStrong = tokenTypes.strong
+        state.essStack.push(tokenTypes.strong)
       } else if (setStrong === false) {
-        state.strong = false
-        if (state.lastEmOrStrong == tokenTypes.em)
-          state.em = false // turn em off too
+        var t = getType(state) // highlight closing *
+        essStackPop(tokenTypes.strong)
+        return t
+      }
+      // String
+      if (setString === true) {
+        state.string = true
+        state.essStack.push(tokenTypes.string)
+      } else if (setString === false) {
+        var t = getType(state) // highlight closing "
+        essStackPop(tokenTypes.string)
+        return t
       }
       return getType(state)
 // ~udon end
@@ -548,8 +608,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         code: 0,
         em: false,
         strong: false,
-        // most recent tokenTypes.em or tokenTypes.strong
-        lastEmOrStrong: null, // ~udon
+        string: false, // ~udon
+        essStack: [], // ~udon
         header: 0,
         hr: false,
         list: false,
@@ -581,7 +641,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         code: s.code,
         em: s.em,
         strong: s.strong,
-        lastEmOrStrong: s.lastEmOrStrong, // ~udon
+        string: s.string, // ~udon
+        essStack: s.essStack, // ~udon
         header: s.header,
         hr: s.hr,
         list: s.list,
@@ -639,9 +700,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
     getType: getType,
 
-    blockCommentStart: "<!--",
-    blockCommentEnd: "-->",
     closeBrackets: "()[]{}''\"\"``",
+
     fold: "udon"
   };
   return mode;
