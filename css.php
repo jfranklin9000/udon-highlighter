@@ -50,8 +50,9 @@
 		$name = "rendered/$file";
 		$html = file_get_contents($name);
 		// idempotent..
+		$doctype = (stripos($html, "<!doctype html>\n") === false) ? "<!doctype html>\n" : "";
 		$html = str_replace('<head></head>', $head, $html);
-		file_put_contents($name, "<!doctype html>\n" . $html);
+		file_put_contents($name, $doctype . $html);
 	}
 
 ?>

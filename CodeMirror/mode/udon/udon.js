@@ -45,6 +45,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     em: "em",
     strong: "strong",
     string: "string", // udon
+    sail: "keyword", // udon
     error: "error" // udon
   };
 
@@ -108,6 +109,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 //,   fencedCodeRE = /^(~~~+|```+)[ \t]*([\w+#-]*)[^\n`]*$/ // markdown
   ,   fencedCodeRE = /^```(.*)$/                            // udon - match more than ```
       //
+      // udon - sail expressions - ;html
+      // XX - probably doesn't match parser exactly - fix me
+  ,   sailRE = /^;(.*)$/
+      //
       // no change
   ,   expandedTab = "    " // CommonMark specifies tab as 4 spaces
 // ~udon end
@@ -164,6 +169,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     //        XX this code does not catch the case of a
     //        fenced code block that directly follows a
     //        header.. are there more cases? - fix me
+    //        (same with header following a header)
     if (state.prevLine.header === true && !lineIsEmpty(state.thisLine.stream)) {
       state.udonParseError = true;
     }
@@ -243,6 +249,11 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.hr = true;
       state.thisLine.hr = true;
       return (match[1].length == 0) ? tokenTypes.hr : tokenTypes.error;
+    } else if (firstTokenOnLine && stream.match(sailRE)) {
+      state.sail = true;
+      var t = getType(state);
+      state.sail = false;
+      return t;
     }
 
     return switchInline(stream, state, state.inline);
@@ -306,6 +317,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (state.linkHref) {
       styles.push(tokenTypes.linkHref, "url");
     } else { // Only apply inline styles to non-url text
+      if (state.sail) { styles.push(tokenTypes.sail); } // ~udon
       if (state.string) { styles.push(tokenTypes.string); } // ~udon
       if (state.strong) { styles.push(tokenTypes.strong); }
       if (state.em) { styles.push(tokenTypes.em); }
