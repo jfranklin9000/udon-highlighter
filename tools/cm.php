@@ -6,7 +6,7 @@
 	if (($snip = file_get_contents($argv[1])) === false)
 		exit("could not open $argv[1]\n");
 
-	define('TEMPLATE', 'cm-template.html');
+	define('TEMPLATE', 'templates/cm.html');
 
 	if (($html = file_get_contents(TEMPLATE)) === false)
 		exit("could not open " . TEMPLATE . "\n");

@@ -3,7 +3,7 @@
 	if ($argc != 2)
 		exit("iframe.php takes 1 argument\n");
 
-	define('TEMPLATE', 'iframe-template.html');
+	define('TEMPLATE', 'templates/iframe.html');
 
 	if (($html = file_get_contents(TEMPLATE)) === false)
 		exit("could not open " . TEMPLATE . "\n");

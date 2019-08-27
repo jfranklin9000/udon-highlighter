@@ -32,9 +32,10 @@ clean:
 	rm -f static-site/*.udon cms/*.html iframes/*.html rendered/*.html rendered/*.udon
 
 static-site/%.udon: snips/%.snip
-	php snip.php $< > $@
-	php cm.php $< > cms/$*.html
-	php iframe.php $* > iframes/$*.html
+	@echo "---" $< "---"
+	php tools/snip.php $< > $@
+	php tools/cm.php $< > cms/$*.html
+	php tools/iframe.php $* > iframes/$*.html
 
 # we don't want snip processing for this
 static-site/index.udon: index.udon
@@ -42,7 +43,8 @@ static-site/index.udon: index.udon
 
 # what the heck, send markdown through the udon parser
 static-site/README.udon: README.md
+	@echo "---" $< "---"
 	printf ";>\n\n" > static-site/README.udon
 	cat README.md >> static-site/README.udon
-	php cm.php README.md > cms/README.html
-	php iframe.php README > iframes/README.html
+	php tools/cm.php README.md > cms/README.html
+	php tools/iframe.php README > iframes/README.html
