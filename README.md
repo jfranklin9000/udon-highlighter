@@ -11,7 +11,7 @@ _*WORK IN PROGRESS - not ready for evaluation or bug reports*_
 [https://jfranklin9000.com/udon-highlighter](https://jfranklin9000.com/udon-highlighter)
 _(self-signed certificate)_
 
-- The deliverable is `udon-highlighter/CodeMirror/mode/udon/udon.js`.
+- The deliverable is `CodeMirror/mode/udon/udon.js`.
 
 - Command line `php` is required to process new tests.
 
