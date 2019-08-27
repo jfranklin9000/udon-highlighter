@@ -1,0 +1,15 @@
+;>
+> can't show block code literals\
+  inside block code literals and\
+  udon doesn't support indented\
+  code so we can't fake it
+
+```
+(def Y (fn [f]
+       ((fn [x]
+          (x x))
+        (fn [x]
+          (f (fn [y]
+               ((x x) y)))))))
+```
+

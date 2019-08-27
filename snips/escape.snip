@@ -4,27 +4,17 @@
 
 -- -- -- --
 
-> add message - XX fix me
+> highlighter show "text" as italic\
+  behaviour inherited from markdown(?)\
+  XX - fix me
 
 not \_italic_ text
 
+> highlighter show "text" as bold\
+  behaviour inherited from markdown(?)\
+  XX - fix me
+
 not \*bold* text
-
-TOSS:
-
-Here is some _italic_ text.
-
-Here is some *bold* text.
-
-> highlighter show "text." as italic\
-  behaviour inherited from markdown
-
-Here is some \_non-italic_ text.
-
-> highlighter show "text." as bold\
-  behaviour inherited from markdown
-
-Here is some \*non-bold* text.
 
 -- -- -- --
 
@@ -34,5 +24,11 @@ Here is some \*non-bold* text.
 
 \+ not an ordered list item
 
-\"not a double quote"
+> highlighter show second quote as opening\
+  a string (parser doesn't)\
+  XX - fix me
+
+\"not a double quote" what happens here?
+
+- add more tests - XX fix me
 

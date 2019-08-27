@@ -1,43 +1,58 @@
 
 
-> add comment - XX fix me
-
-this is some text
-
-$ this is some text
-
--- -- -- --
-
-> `%columns-advanced` (update headers.snip)
-
-$ #
-
-> `%columns-advanced` (update headers.snip)
-
-$ # hello
+> move some of these test to the appropriate places
 
 TABS
 
--- -- -- --
+_ital "string nope_
 
-abc ### 123
+_ital "string" yep_
 
--- -- -- --
+<http://hello.com>
 
-;=
-  ;p
-    ;strong: Don't panic!
-    <br>
-    ;small: [reactive publishing intensifies]
-  ==
-==
+<div><p>hello</p></div>
+
+goodbye
+
+#hoon
+
+##hoon
+
+1. not list item
+
++ one space
+
+> parse error [%columns-advanced 4 3]
+
+$+  two spaces
+
+> parse error [%columns-advanced 5 3]
+
+$+   three spaces
+
+> lus newline - not a list item
+
++
+
+> lus ace newline - list item
+
++ 
+
+> hep newline - not a list item
+
+-
+
+> hep ace newline - list item
+
+- 
 
 -- -- -- --
 
 `### header
 some text`
 
-`[%bad-block-structure %head 1 1]
+`[
+%bad-block-structure %head 1 1]
 [%err [~ u=[p=12 q=1]]]
 %finished-preprocessing`
 
@@ -50,51 +65,6 @@ some text`
 [%err [~ u=[p=12 q=7]]]
 %finished-preprocessing
 `
-
--- -- -- --
-
-hep hep hep
----
-
-ace hep hep hep
-` ---`
-
-hep hep hep hep
-----
-
-not a horizontal rule
-***
-
-not a horizontal rule
-___
-
--- -- -- --
-
-~~strikethrough~~
-
--- -- -- --
-
-> As Gregor Samsa awoke one morning from uneasy dreams, he
-  found himself transformed in his bed into a *monstrous* vermin.
-
-Quote break.
-
-> _See_ the child.
-
-  He is pale and thin, he wears a thin and ragged linen shirt.
-
-> As Gregor Samsa awoke one morning from uneasy dreams, he
-  found himself transformed in his bed into a *monstrous* vermin.
-
-> As Gregor Samsa awoke one morning from uneasy dreams, he
-  found himself transformed in his bed into a *monstrous* vermin.
-
-> As Gregor Samsa awoke one morning from uneasy dreams, he
-  found himself transformed in his bed into a *monstrous* vermin.
-
-As Gregor Samsa awoke one morning from uneasy dreams, he
-found himself transformed in his bed into a *monstrous* vermin.
-
 -- -- -- --
 
 parser bug:
