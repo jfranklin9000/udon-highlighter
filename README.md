@@ -4,6 +4,13 @@ Udon Syntax Highlighter Bounty Test Environment
 
 _*WORK IN PROGRESS - not ready for evaluation or bug reports*_
 
+[https://github.com/jfranklin9000/udon-highlighter](https://github.com/jfranklin9000/udon-highlighter)
+
+[http://jfranklin9000.com/udon-highlighter](http://jfranklin9000.com/udon-highlighter)
+
+[https://jfranklin9000.com/udon-highlighter](https://jfranklin9000.com/udon-highlighter)
+_(self-signed certificate)_
+
 - The deliverable is `udon-highlighter/CodeMirror/mode/udon/udon.js`.
 
 - Command line `php` is required to process new tests.

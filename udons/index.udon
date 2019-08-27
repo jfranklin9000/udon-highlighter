@@ -1,8 +1,15 @@
-;>
-
 # udon-highlighter
 
 Udon Syntax Highlighter Bounty Test Environment
+
+_*WORK IN PROGRESS - not ready for evaluation or bug reports*_
+
+[https://github.com/jfranklin9000/udon-highlighter](https://github.com/jfranklin9000/udon-highlighter)
+
+[http://jfranklin9000.com/udon-highlighter](http://jfranklin9000.com/udon-highlighter)
+
+[https://jfranklin9000.com/udon-highlighter](https://jfranklin9000.com/udon-highlighter)
+_(self-signed certificate)_
 
 #### [README.md](../iframes/README.html)
 
@@ -42,4 +49,4 @@ Udon Syntax Highlighter Bounty Test Environment
 
 #### [Misc](../iframes/misc.html)
 
-#### [Newline](../iframes/newline.html)
+#### [Empty](../iframes/empty.html)

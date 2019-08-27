@@ -1,7 +1,10 @@
 # ~dirwex-dosrev
 # August 7, 2019
 
-UDONS = \
+# you can't have `snips/foo.snip` and `udons/foo.udon`
+# as they'd both be processed into `static-site/foo.udon`
+
+STATIC = \
 	static-site/README.udon \
 	static-site/index.udon \
 	static-site/front-matter.udon \
@@ -22,9 +25,9 @@ UDONS = \
 	static-site/poem.udon \
 	static-site/sail-expressions.udon \
 	static-site/misc.udon \
-	static-site/newline.udon
+	static-site/empty.udon
 
-all: $(UDONS)
+all: $(STATIC)
 
 css:
 	php tools/css.php
@@ -38,9 +41,12 @@ static-site/%.udon: snips/%.snip
 	php tools/cm.php $< > cms/$*.html
 	php tools/iframe.php $* > iframes/$*.html
 
-# we don't want snip processing for this
-static-site/index.udon: index.udon
-	cp index.udon static-site/index.udon
+static-site/%.udon: udons/%.udon
+	@echo "---" $< "---"
+	printf ";>\n\n" > $@
+	cat $< >> $@
+	php tools/cm.php $< > cms/$*.html
+	php tools/iframe.php $* > iframes/$*.html
 
 # what the heck, send markdown through the udon parser
 static-site/README.udon: README.md
