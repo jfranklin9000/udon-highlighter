@@ -2,7 +2,9 @@
 # August 7, 2019
 
 UDONS = \
+	static-site/README.udon \
 	static-site/index.udon \
+	static-site/front-matter.udon \
 	static-site/headers.udon \
 	static-site/italics-bold.udon \
 	static-site/line-break.udon \
@@ -20,13 +22,12 @@ UDONS = \
 	static-site/poem.udon \
 	static-site/sail-expressions.udon \
 	static-site/misc.udon \
-	static-site/newline.udon \
-	static-site/README.udon
+	static-site/newline.udon
 
 all: $(UDONS)
 
 css:
-	php css.php
+	php tools/css.php
 
 clean:
 	rm -f static-site/*.udon cms/*.html iframes/*.html rendered/*.html rendered/*.udon

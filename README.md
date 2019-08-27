@@ -1,10 +1,14 @@
 # udon-highlighter
 
-Udon Syntax Highlighter Bounty
+Udon Syntax Highlighter Bounty Test Environment
+
+_*WORK IN PROGRESS - not ready for evaluation or bug reports*_
+
+- The deliverable is `udon-highlighter/CodeMirror/mode/udon/udon.js`.
+
+- Command line `php` is required to process new tests.
 
 ### Clone repository
-
-_*make the repository public*_
 
 ```
 git clone https://github.com/jfranklin9000/udon-highlighter.git
@@ -52,20 +56,71 @@ make css
 ```
 
 The final html files are in `iframes/`.
-The `iframes/` files combine the files
-in `cms/` and `rendered/` in iframes.
+The `iframes/` files are the contents of
+files in `cms/` and `rendered/` in html
+iframes. These can be opened from your
+hard drive, no web server required.
 
 ### Iteration
 
 Edit a `.snip` or create a new one in `snips/`.
 If you create a new `.snip` add it to the `Makefile`.
-A `.snip` should start and end with two blank lines.
 
 ```
 make
 |commit %home
 |static
 make css
+```
+
+A `.snip` should start and end with two blank lines and
+not contain front matter, `;>` or block code literals.
+
+`snips/example.snip` with two snips:
+
+_The udon parser eats a single blank line (if it exists)
+at the start of a block code literal, so the udon parser
+rendering of this doc only shows one blank line at the
+start of `snips/example.snip`. There should be two!_
+
+```
+
+
+UDON-1
+
+-- -- -- --
+
+UDON-2
+
+
+```
+
+`make` will run `tools/snip.php` and produce `static-site/example.udon`:
+
+_The escaped tics will actually be tics._
+
+```
+;>
+
+\`\`\`
+
+UDON-1
+
+\`\`\`
+
+UDON-1
+
+---
+
+\`\`\`
+
+UDON-2
+
+\`\`\`
+
+UDON-2
+
+---
 ```
 
 ### Reset
@@ -75,20 +130,3 @@ make clean
 ```
 
 This deletes the files in `static-site/`, `rendered/`, `cms/` and `iframes/`.
-
-## Questions
-
-- Should we fail gracefully?
-
-- The udon docs say a header are haxes followed
-  by a single space followed by the actual text.
-  Do we want to enforce a single space?
-  The parser doesn't now; I guess the "actual text"
-  can start with spaces.
-
-- `lineIsEmpty(line)` => empty or _whitespace only_.
-  What about udon parser?
-
-### Miscellaneous
-
-- requires command line `php`
