@@ -81,7 +81,7 @@ make
 make css
 ```
 
-A `.snip` (in `snips/` should start and end with two
+A `.snip` (in `snips/`) should start and end with two
 blank lines and not contain front matter, `;>` or block
 code literals.
 
