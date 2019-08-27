@@ -8,7 +8,7 @@
 
 	define('SNIP', '-- -- -- --');
 
-	echo ";>\n\n";
+	echo ";>\n";
 
 	$snips = explode(SNIP, $file);
 

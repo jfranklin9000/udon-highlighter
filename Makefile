@@ -43,15 +43,14 @@ static-site/%.udon: snips/%.snip
 
 static-site/%.udon: udons/%.udon
 	@echo "---" $< "---"
-	printf ";>\n\n" > $@
-	cat $< >> $@
+	cat $< > $@
 	php tools/cm.php $< > cms/$*.html
 	php tools/iframe.php $* > iframes/$*.html
 
 # what the heck, send markdown through the udon parser
 static-site/README.udon: README.md
 	@echo "---" $< "---"
-	printf ";>\n\n" > static-site/README.udon
+	printf ";>\n" > static-site/README.udon
 	cat README.md >> static-site/README.udon
 	php tools/cm.php README.md > cms/README.html
 	php tools/iframe.php README > iframes/README.html

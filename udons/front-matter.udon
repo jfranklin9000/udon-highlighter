@@ -1,0 +1,18 @@
+:-  :~  navhome/'/docs/'
+        sort/'11'
+        title/'Udon'
+    ==
+;>
+The highlighter doesn't seem to trip up on front matter.
+
+It's not highlighted though, suggesting it makes it to
+the output, which isn't true.  It should be grayed out.
+(The `;>` _is_ highlighted because it's a Sail expression.)
+
+What's needed is a mode config indicating if we've seen
+a `;>` or not.  An app like Publish would configure it
+as true so the user doesn't have to add a `;>`.  This
+would be the default and is the current behaviour.
+
+If configured as false the text (front matter) before
+the `;>` would be highlighted gray.

@@ -41,9 +41,9 @@ mkdir -p zod/home/web
 ln -s `pwd`/static-site zod/home/web/static-site
 ```
 
-### Populate `static-site/` from `snips/`
+### Populate `static-site/` from `snips/` and `udons/`
 
-`snips/*.snip` are the udon sources.
+`snips/*.snip` and `udons/*.udon` are the udon sources.
 
 ```
 make
@@ -72,6 +72,7 @@ hard drive, no web server required.
 
 Edit a `.snip` or create a new one in `snips/`.
 If you create a new `.snip` add it to the `Makefile`.
+Do the same with a `.udon` in `udons/`.
 
 ```
 make
@@ -80,8 +81,14 @@ make
 make css
 ```
 
-A `.snip` should start and end with two blank lines and
-not contain front matter, `;>` or block code literals.
+A `.snip` (in `snips/` should start and end with two
+blank lines and not contain front matter, `;>` or block
+code literals.
+
+A `.udon` (in `udons/`) can have front matter and block
+code literals, and _must_ have a `;>`.
+
+#### `.snip` File Format
 
 `snips/example.snip` with two snips:
 
@@ -136,4 +143,4 @@ UDON-2
 make clean
 ```
 
-This deletes the files in `static-site/`, `rendered/`, `cms/` and `iframes/`.
+This deletes file in `static-site/`, `rendered/`, `cms/` and `iframes/`.
