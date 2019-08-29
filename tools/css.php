@@ -18,20 +18,24 @@
 	}
 	pre {
 		background: #eee;
-		padding: 6px;
+		padding: 10px;
 		line-height: 1.5em;
 		font-size: larger;
 		overflow-x: scroll;
 	}
 	code {
-		background: #eee;		/* #e94; */ /* #a50 in highlighter */
-		padding: 6px;
+		background: #eee;		/* #a50 in highlighter */
+		padding: 5px;
 		white-space: pre-wrap;
 		font-size: larger;
 	}
 	blockquote {
 		background: #aca;		/* #090 in highlighter */
-		padding: 6px;
+		padding: 0 20px;
+	}
+	div div {					/* poem */
+		background: #bbf;		/* #00f in highlighter */
+		padding: 0 20px;
 	}
 	a {
 		color: inherit;

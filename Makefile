@@ -25,7 +25,8 @@ STATIC = \
 	static-site/poem.udon \
 	static-site/sail-expressions.udon \
 	static-site/misc.udon \
-	static-site/empty.udon
+	static-site/empty-snip.udon \
+	static-site/empty-udon.udon
 
 all: $(STATIC)
 

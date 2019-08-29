@@ -46,6 +46,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     strong: "strong",
     string: "string", // udon
     sail: "keyword", // udon
+    poem: "def", // udon
     error: "error" // udon
   };
 
@@ -208,6 +209,12 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var match = null;
     if (stream.eatSpace()) {
       return null;
+    } else if (stream.column() == 8) { // ~udon - poem
+      stream.match(/^.*$/); // match rest of line
+      state.poem = true;
+      var t = getType(state);
+      state.poem = false;
+      return t;
     } else if (firstTokenOnLine && (match = stream.match(atxHeaderRE))) {
       state.udonParseError = (stream.column() != 0) || (match[1].length > 6); // ~udon - XX what about indentation?
       state.quote = 0;
@@ -317,6 +324,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (state.linkHref) {
       styles.push(tokenTypes.linkHref, "url");
     } else { // Only apply inline styles to non-url text
+      if (state.poem) { styles.push(tokenTypes.poem); } // ~udon
       if (state.sail) { styles.push(tokenTypes.sail); } // ~udon
       if (state.string) { styles.push(tokenTypes.string); } // ~udon
       if (state.strong) { styles.push(tokenTypes.strong); }

@@ -1,21 +1,24 @@
 
 
-> change css to get poems showing better
-
-> highlighter doesn't highlight poems\
-  XX fix me - unimplemented
+> the udon parser does not do italics, bold or duoble quotes;
+  a blank line closes the poem (unlike (potentially) a block quote)
 
 Quote break.
 
-        A shape with lion body and the head of a man,
+        A shape with *lion body* and the head of a man,
         A gaze blank and pitiless as the sun,
         Is moving its slow thighs, while all about it
-        Reel shadows of the indignant desert birds.
+        Reel shadows of the indignant *desert birds*.
 
-        A shape with lion body and the head of a man,
+        A shape with _lion body_ and the head of a man,
         A gaze blank and pitiless as the sun,
         Is moving its slow thighs, while all about it
-        Reel shadows of the indignant desert birds.
+        Reel shadows of the indignant _desert birds_.
+
+        A shape with "lion body" and the head of a man,
+        A gaze blank and pitiless as the sun,
+        Is moving its slow thighs, while all about it
+        Reel shadows of the indignant "desert birds".
 
 Poem break.
 
@@ -23,4 +26,30 @@ A shape with lion body and the head of a man,
 A gaze blank and pitiless as the sun,
 Is moving its slow thighs, while all about it
 Reel shadows of the indignant desert birds.
+
+> Block Quote
+
+Need quote break here, else parser error.\
+XX - the highlighter should detect this and show error - fix me
+
+        indented literals need to end with a blank line
+        + this is not a list item
+        - neither is this
+        # this is not a header
+        this is not a horizontal rule:
+        ---
+        ```
+        this is not a block code literal
+        ```
+        `this is not an inline code literal`
+        ++arm:core is also not an inline code literal
+        _this is not italics_
+        *this is not bold*
+        "this is not a double quote"
+        > this is not a block quote
+        %this-is-not-a-hoon-constant
+        anything else?
+
+Delete previous blank line to see parser error handling.\
+XX - fix me
 
