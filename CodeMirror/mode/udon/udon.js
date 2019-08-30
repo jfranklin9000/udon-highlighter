@@ -150,7 +150,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     // Reset opened EM STRONG STRING stack state
     state.essStack = []; // ~udon
     // Reset state.quote
-    state.quote = 0;
+    // state.quote = 0; // ~udon - no, block quotes can span blank lines
     // Reset state.trailingSpace
     state.trailingSpace = 0;
     state.trailingSpaceNewLine = false;
@@ -210,6 +210,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (stream.eatSpace()) {
       return null;
     } else if (stream.column() == 8) { // ~udon - poem
+      state.quote = 0;
       stream.match(/^.*$/); // match rest of line
       state.poem = true;
       var t = getType(state);
@@ -253,10 +254,12 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.code = -1
       return getType(state);
     } else if ((match = stream.match(hrRE))) {
+      state.quote = 0;
       state.hr = true;
       state.thisLine.hr = true;
       return (match[1].length == 0) ? tokenTypes.hr : tokenTypes.error;
     } else if (firstTokenOnLine && stream.match(sailRE)) {
+      state.quote = 0;
       state.sail = true;
       var t = getType(state);
       state.sail = false;
@@ -371,6 +374,12 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
   function handleText(stream, state) {
 // ~udon start
+    if (stream.column() == 0) {
+      // "Blank newlines do not end the block quote,
+      // but a blank newline followed by an unindented
+      // line of text will end the quote." - udon docs
+      state.quote = 0;
+    }
     if (stream.match(armRE) || stream.match(dateRE) ||
         stream.match(hexRE) || stream.match(termRE) ||
         stream.match(patpRE)) {
