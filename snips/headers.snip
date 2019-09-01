@@ -27,14 +27,19 @@ $####### not a header 7
 
 #
 
-> ace hax newline - not a header, or parser error?\
-  highlighter says not a header\
-  parser says parser error `%indent-pattern-violation`\
-  (no, `%columns-advanced`?)\
-  XX fix me\
+> ace hax newline - parser error `%columns-advanced`\
   delete $ to see highlighter handling
 
+quote break
+
 $ #
+
+> ace hax text - parser error `%columns-advanced`\
+  delete $ to see highlighter handling
+
+quote break
+
+$ # parser error
 
 -- -- -- --
 
@@ -44,22 +49,18 @@ $ #
 
 ##not a header
 
-> parser error so prefix with $\
-  delete $ to see highlighter handling
-
-$ # not a header
-
 -- -- -- --
-
-> parser error so prefix with $\
-  delete $ to see highlighter handling\
-  (doesn't show as error - XX fix me)
-
-not an <h2> setext header in udon (why is it a parse error?)
-$===
 
 not an <h3> setext header in udon (it's a horizontal rule)
 ---
+
+> parser error so prefix with $\
+  delete $ to see highlighter handling\
+  (doesn't show as error - XX fix me)\
+  (the udon parser silently fails)
+
+not an <h2> setext header in udon (why is it a parse error?)
+$===
 
 -- -- -- --
 

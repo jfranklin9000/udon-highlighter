@@ -80,13 +80,13 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       // udon - hoon constant - ~2017.8.29
       // try matching this before textRE so that
       // date~2017.8.29 doesn't appear to partially match
-      // XX - probably doesn't match parser exactly - fix me
+      // XX - probably doesn't match udon parser exactly - fix me
   ,   dateRE = /^~\d+\.\d+\.\d+(?: |$)/
       //
       // udon - hoon constant - 0xdead.beef
       // try matching this before textRE so that
       // hex0xdead.beef doesn't appear to partially match
-      // XX - probably doesn't match parser exactly - fix me
+      // XX - probably doesn't match udon parser exactly - fix me
   ,   hexRE = /^0x[0-9a-z]+(?:\.[0-9a-z]+)*(?: |$)/
       //
       // udon - hoon constant - %term
@@ -97,7 +97,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       // udon - hoon constant - ~zod
       // try matching this before textRE so that
       // zod~zod doesn't appear to partially match
-      // XX - probably doesn't match parser exactly - fix me
+      // XX - probably doesn't match udon parser exactly - fix me
       // (regex won't be able to handle this)
   ,   patpRE = /^~[a-z]+(?:\-[a-z]+)*(?: |$)/
       //
@@ -111,8 +111,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   ,   fencedCodeRE = /^```(.*)$/                            // udon - match more than ```
       //
       // udon - sail expressions - ;html
-      // XX - probably doesn't match parser exactly - fix me
-  ,   sailRE = /^;(.*)$/
+      // XX - probably doesn't match udon parser exactly - fix me
+  ,   sailRE = /^==$|;.*$/
       //
       // no change
   ,   expandedTab = "    " // CommonMark specifies tab as 4 spaces
@@ -211,7 +211,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var match = null;
     if (stream.eatSpace()) {
       return null;
-    } else if (stream.column() == 8) { // ~udon - poem
+    } else if (firstTokenOnLine && state.listStack.length == 0 && stream.column() == 8) { // ~udon - poem
       state.quote = 0;
       stream.match(/^.*$/); // match rest of line
       state.poem = true;
@@ -257,8 +257,9 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       if (modeCfg.highlightFormatting) state.formatting = "code-block";
       state.code = -1
       return getType(state);
-    } else if ((match = stream.match(hrRE))) {
-      state.quote = 0;
+    } else if (firstTokenOnLine && (match = stream.match(hrRE))) {
+      if (stream.column() == 0)
+          state.quote = 0;
       state.hr = true;
       state.thisLine.hr = true;
       if (state.udonParseError) // udon header/blank-line parser bug
@@ -384,11 +385,26 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
   function handleText(stream, state) {
 // ~udon start
-    if (stream.column() == 0) {
+    var column = stream.column();
+    var firstTokenOnLine = column === state.indentation;
+    if (column == 0) {
       // "Blank newlines do not end the block quote,
       // but a blank newline followed by an unindented
       // line of text will end the quote." - udon docs
       state.quote = 0;
+    }
+    // udon %columns-advanced parser error handling
+    if (firstTokenOnLine) {
+      if (state.quote) {
+        if (column != 2)
+          state.udonParseError = true;
+      } else if (state.listStack.length > 0) {
+        if (column != state.listStack[state.listStack.length - 1])
+          state.udonParseError = true;
+      } else {
+        if (column != 0 && column != 8)
+          state.udonParseError = true;
+      }
     }
     if (stream.match(armRE) || stream.match(dateRE) ||
         stream.match(hexRE) || stream.match(termRE) ||

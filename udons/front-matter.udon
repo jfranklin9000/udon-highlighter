@@ -3,6 +3,9 @@
         title/'Udon'
     ==
 ;>
+(The following two paragraphs aren't true.
+Must handle front matter.)
+
 The highlighter doesn't seem to trip up on front matter.
 
 It's not highlighted though, suggesting it makes it to
