@@ -18,11 +18,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
   if (modeCfg.highlightFormatting === undefined)
     modeCfg.highlightFormatting = false;
 
-  // Maximum number of nested blockquotes. Set to 0 for infinite nesting.
-  // Excess `>` will emit `error` token.
-  if (modeCfg.maxBlockquoteDepth === undefined)
-    modeCfg.maxBlockquoteDepth = 0;
-
   // Allow token types to be overridden by user-provided token types.
   if (modeCfg.tokenTypeOverrides === undefined)
     modeCfg.tokenTypeOverrides = {};
@@ -357,11 +352,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         // Add `formatting-quote` and `formatting-quote-#` for blockquotes
         // Add `error` instead if the maximum blockquote nesting depth is passed
         if (state.formatting[i] === "quote") {
-          if (!modeCfg.maxBlockquoteDepth || modeCfg.maxBlockquoteDepth >= state.quote) {
-            styles.push(tokenTypes.formatting + "-" + state.formatting[i] + "-" + state.quote);
-          } else {
-            styles.push("error");
-          }
+          styles.push(tokenTypes.formatting + "-" + state.formatting[i] + "-" + state.quote);
         }
       }
     }
@@ -387,12 +378,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (state.quote) {
       styles.push(tokenTypes.quote);
 
-      // Add `quote-#` where the maximum for `#` is modeCfg.maxBlockquoteDepth
-      if (!modeCfg.maxBlockquoteDepth || modeCfg.maxBlockquoteDepth >= state.quote) {
-        styles.push(tokenTypes.quote + "-" + state.quote);
-      } else {
-        styles.push(tokenTypes.quote + "-" + modeCfg.maxBlockquoteDepth);
-      }
+      // Add `quote-#`
+      styles.push(tokenTypes.quote + "-" + state.quote);
     }
 
     if (state.list !== false) {
