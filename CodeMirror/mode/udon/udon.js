@@ -339,7 +339,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var styles = [];
 
     // ~udon
-    if (state.udonParseError && state.quote == 0)
+    if (state.udonParseError && state.quote == 0 && state.listStack.length == 0)
       styles.push("error");
 
     if (state.formatting) {

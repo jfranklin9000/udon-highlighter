@@ -19,9 +19,8 @@
 +not an ordered list item
 
 > parser error `%indent-pattern-violation %bloc` so prefix with $\
-  delete $ to see highlighter handling
-
-> these show as list items in the highlighter - XX fix me
+  delete $ to see highlighter handling\
+  parser errors disabled in list items - XX fix me
 
 $ - not an unordered list item
 
@@ -29,33 +28,30 @@ $ + not an ordered list item
 
 -- -- -- --
 
-> `%bad-block-structure %lime`
-
-$- hello
-goodbye
-
-> `%bad-block-structure %lime` if remove both $\
-  `%columns-advanced` if only second removed
-
-$- hello
-$ goodbye
-
 - hello
   goodbye
 
-> %bad-block-structure %lime
++ hello
+  goodbye
+
+> `%bad-block-structure %lime`\
+  parser errors disabled in list items - XX fix me
+
+$- hello
+goodbye
 
 $+ hello
 goodbye
 
 > `%bad-block-structure %lime` if remove both $\
-  `%columns-advanced` if only second removed
+  `%columns-advanced` if only second removed\
+  parser errors disabled in list items - XX fix me
+
+$- hello
+$ goodbye
 
 $+ hello
 $ goodbye
-
-+ hello
-  goodbye
 
 -- -- -- --
 
