@@ -2,7 +2,6 @@
 // Distributed under an MIT license: https://codemirror.net/LICENSE
 
 (function(mod) {
-// do we need ../xml/xml ? ~udon
   if (typeof exports == "object" && typeof module == "object") // CommonJS
     mod(require("../../lib/codemirror"), require("../xml/xml"), require("../meta"));
   else if (typeof define == "function" && define.amd) // AMD
@@ -211,7 +210,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var match = null;
     if (stream.eatSpace()) {
       return null;
-    } else if (firstTokenOnLine && state.listStack.length == 0 && stream.column() == 8) { // ~udon - poem
+    } else if (firstTokenOnLine && state.listStack.length == 0
+        && state.quote == 0 && stream.column() == 8) { // ~udon - poem
       state.quote = 0;
       stream.match(/^.*$/); // match rest of line
       state.poem = true;
