@@ -221,7 +221,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     } else if (firstTokenOnLine && (match = stream.match(atxHeaderRE))) {
       if (stream.column() != 0 || match[1].length > 6) // ~udon - XX what about indentation?
         state.udonParseError = true;
-      state.quote = 0;
+      if (stream.column() == 0 && state.quote) {
+        state.quote = 0;
+        state.udonParseError = match[1].length > 6;
+      }
       state.header = match[1].length;
       state.thisLine.header = true;
       if (modeCfg.highlightFormatting) state.formatting = "header";
@@ -236,7 +239,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 **/
 // udon start
     } else if ((match = stream.match(/^> /))) {
-      state.quote = firstTokenOnLine ? 1 : state.quote + 1;
+      state.quote = state.quote + 1;
       if (modeCfg.highlightFormatting) state.formatting = "quote";
       // ">  text" is a parser error, but ">  " is not
       if (stream.peek() == ' ' && !stream.match(/^ +$/))
@@ -248,7 +251,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
       state.indentation = lineIndentation + stream.current().length;
       state.list = true;
-      state.quote = 0;
+      if (stream.column() == 0) {
+        state.quote = 0;
+        state.udonParseError = false;
+      }
 
       // Add this list item's content's indentation to the stack
       state.listStack.push(state.indentation);
@@ -259,7 +265,10 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     } else if (firstTokenOnLine && (match = stream.match(fencedCodeRE))) {
       if (stream.column() != 0 || match[1].length > 0) // ~udon - XX what about indentation?
         state.udonParseError = true;
-      state.quote = 0;
+      if (stream.column() == 0 && state.quote) {
+        state.quote = 0;
+        state.udonParseError = match[1].length > 0;
+      }
 // ~udon
 //    state.fencedEndRE = new RegExp(match[1] + "+ *$"); // markdown
       state.fencedEndRE = fencedCodeRE;                  // udon
@@ -269,15 +278,20 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       state.code = -1
       return getType(state);
     } else if (firstTokenOnLine && (match = stream.match(hrRE))) {
-      if (stream.column() == 0)
-          state.quote = 0;
+      if (stream.column() != 0 || match[1].length > 0)
+        state.udonParseError = true;
+      if (stream.column() == 0 && state.quote) {
+        state.quote = 0;
+        state.udonParseError = match[1].length > 0;
+      }
       state.hr = true;
       state.thisLine.hr = true;
-      if (state.udonParseError) // udon header/blank-line parser bug
-        return tokenTypes.error;
-      return (match[1].length == 0) ? tokenTypes.hr : tokenTypes.error;
+      return getType(state);
     } else if (firstTokenOnLine && stream.match(sailRE)) {
-      state.quote = 0;
+      if (stream.column() == 0 && state.quote) {
+        state.quote = 0;
+        state.udonParseError = false;
+      }
       state.sail = true;
       var t = getType(state);
       state.sail = false;
@@ -292,13 +306,19 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var hasExitedList = state.indentation < currListInd;
     var maxFencedEndInd = currListInd + 3;
     var match; // ~udon
-    if (state.fencedEndRE && state.indentation <= maxFencedEndInd && (hasExitedList || (match = stream.match(state.fencedEndRE)))) {
+//  if (state.fencedEndRE && state.indentation <= maxFencedEndInd         // markdown
+//    && (hasExitedList || (match = stream.match(state.fencedEndRE)))) {  // markdown
+    if (state.fencedEndRE && (match = stream.match(state.fencedEndRE))) { // udon
       // might already be true from opening ```
       // but that has already been highlighted
       // so we'll turn it off..
       state.udonParseError = false;
       if (stream.column() != 0 || match[1].length > 0) // ~udon - XX what about indentation? hasExitedList?
         state.udonParseError = true;
+      if (stream.column() == 0 && state.quote) {
+        state.quote = 0;
+        state.udonParseError = match[1].length > 0;
+      }
       if (modeCfg.highlightFormatting) state.formatting = "code-block";
       var returnType;
       if (!hasExitedList) returnType = getType(state)
@@ -319,7 +339,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     var styles = [];
 
     // ~udon
-    if (state.udonParseError)
+    if (state.udonParseError && state.quote == 0)
       styles.push("error");
 
     if (state.formatting) {
@@ -349,6 +369,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     if (state.linkHref) {
       styles.push(tokenTypes.linkHref, "url");
     } else { // Only apply inline styles to non-url text
+      if (state.hr) { styles.push(tokenTypes.hr); } // ~udon
       if (state.poem) { styles.push(tokenTypes.poem); } // ~udon
       if (state.sail) { styles.push(tokenTypes.sail); } // ~udon
       if (state.string) { styles.push(tokenTypes.string); } // ~udon
@@ -407,7 +428,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     // udon %columns-advanced parser error handling
     if (firstTokenOnLine) {
       if (state.quote) {
-        if (column != 2)
+        if (column != 2 * state.quote)
           state.udonParseError = true;
       } else if (state.listStack.length > 0) {
         if (column != state.listStack[state.listStack.length - 1])

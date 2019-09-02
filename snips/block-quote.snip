@@ -51,14 +51,32 @@ $        poem - this is a parser error if you delete the $
 
 -- -- -- --
 
+$  > not a block quote, parser error - XX fix highlighter
+
+-- -- -- --
+
 "This block quote can itself contain more Udon, including
 more block quotes to render nested levels of quotation."
 
-THE HIGHLIGHTER DOES NOT HANDLE THIS - XX FIX ME
+The highlighter turns off error reporting in block quotes.\
+XX - fix me
 
 > block quote
   more block quote
   > nested block quote
     more nested block quote
     # header
+
+    need blank line after header\
+    (highlighter doesn't show errors in block quotes)
+    ---
+    + list item
+    - list item
+    ```
+    code
+    ```
+    > even more
+      nesting
+
+quote break
 
