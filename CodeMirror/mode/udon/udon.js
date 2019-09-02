@@ -173,7 +173,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     //        (same with header following a header)
     if (state.prevLine.header === true && !lineIsEmpty(state.thisLine.stream)) {
       state.udonParseError = true;
-    } else {
+    } else if (firstTokenOnLine && state.prevLine.hr) {
       state.udonParseError = false;
     }
 
@@ -227,11 +227,22 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
       if (modeCfg.highlightFormatting) state.formatting = "header";
       state.f = state.inline;
       return getType(state);
+/** markdown
     } else if (stream.eat('>')) {
       state.quote = firstTokenOnLine ? 1 : state.quote + 1;
       if (modeCfg.highlightFormatting) state.formatting = "quote";
       stream.eatSpace();
       return getType(state);
+**/
+// udon start
+    } else if ((match = stream.match(/^> /))) {
+      state.quote = firstTokenOnLine ? 1 : state.quote + 1;
+      if (modeCfg.highlightFormatting) state.formatting = "quote";
+      // ">  text" is a parser error, but ">  " is not
+      if (stream.peek() == ' ' && !stream.match(/^ +$/))
+        state.udonParseError = true;
+      return getType(state);
+// udon end
     } else if (firstTokenOnLine && (match = stream.match(listRE))) {
       var listType = (match[1] == '+') ? "ol" : "ul";
 
@@ -387,7 +398,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 // ~udon start
     var column = stream.column();
     var firstTokenOnLine = column === state.indentation;
-    if (column == 0) {
+    if (column == 0 && lineIsEmpty(state.prevLine.stream)) {
       // "Blank newlines do not end the block quote,
       // but a blank newline followed by an unindented
       // line of text will end the quote." - udon docs
@@ -529,26 +540,20 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         while (state.essStack.length) {
           switch (state.essStack.pop()) {
             case tokenTypes.em:
-              // console.log('popped EM')
               state.em = false
               if (tokenType == tokenTypes.em)
                 return
               break
             case tokenTypes.strong:
-              // console.log('popped STRONG')
               state.strong = false
               if (tokenType == tokenTypes.strong)
                 return
               break
             case tokenTypes.string:
-              // console.log('popped STRING')
               state.string = false
               if (tokenType == tokenTypes.string)
                 return
               break
-            // default:
-            //   console.log("essStackPop(): unknown tokenType:", tokenType)
-            //   break
           }
         }
       }
@@ -557,27 +562,24 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         state.em = true
         state.essStack.push(tokenTypes.em)
       } else if (setEm === false) {
-        var t = getType(state) // highlight closing _
         essStackPop(tokenTypes.em)
-        return t
+        return getType(state) // highlight closing _
       }
       // Strong
       if (setStrong === true) {
         state.strong = true
         state.essStack.push(tokenTypes.strong)
       } else if (setStrong === false) {
-        var t = getType(state) // highlight closing *
         essStackPop(tokenTypes.strong)
-        return t
+        return getType(state) // highlight closing *
       }
       // String
       if (setString === true) {
         state.string = true
         state.essStack.push(tokenTypes.string)
       } else if (setString === false) {
-        var t = getType(state) // highlight closing "
         essStackPop(tokenTypes.string)
-        return t
+        return getType(state) // highlight closing "
       }
       return getType(state)
 // ~udon end
@@ -604,7 +606,7 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
   function linkHref(stream, state) {
     // Check if space, and return NULL if so (to avoid marking the space)
-    if(stream.eatSpace()){
+    if (stream.eatSpace()) {
       return null;
     }
     var ch = stream.next();

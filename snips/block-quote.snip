@@ -9,21 +9,54 @@ Quote break.
 
   He is pale and thin, he wears a thin and ragged linen shirt.
 
-Deleting previous blank line is a parser error.\
-XX - highlighter doesn't show error - fix me
+Deleting the previous blank line results in `%bad-block-structure` parser error.\
+Delete it to see highlighter handling.
+
 
 -- -- -- --
 
->Not a block quote. XX - fix highlighter
+        gar newline - not a block quote
+
+>
+
+        gar text - not a block quote
+
+>not a block quote
+
+        gar ace ace text is a parser error %columns-advanced
+
+> <- add another space here (parser error) to see highlighter handling
+
+quote break
+
+        gar ace newline - block quote
+        look at DOM to see `<blockquote></blockquote>`
+
+> 
+
+quote break
+
+        gar ace ace newline - block quote
+        look at DOM to see `<blockquote></blockquote>`
+
+>  
+
+-- -- -- --
+
+> block quote
+
+$        poem - this is a parser error - XX fix highlighter
 
 -- -- -- --
 
 "This block quote can itself contain more Udon, including
 more block quotes to render nested levels of quotation."
 
-What's the syntax for this?  The docs don't say.  Is it even true?
+THE HIGHLIGHTER DOES NOT HANDLE THIS - XX FIX ME
 
 > block quote
   more block quote
-
+  > nested block quote
+    more nested block quote
+    # header
 
