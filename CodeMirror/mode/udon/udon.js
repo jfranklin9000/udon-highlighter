@@ -15,6 +15,8 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
 
   // Should characters that affect highlighting be highlighted separate?
   // Does not include characters that will be output (such as `1.` and `-` for lists)
+  // Add `.cm-s-default .cm-formatting {color: pink;}` to codemirror.css
+  // (or wherever) to see this if modeCfg.highlightFormatting is set to true.
   if (modeCfg.highlightFormatting === undefined)
     modeCfg.highlightFormatting = false;
 
@@ -509,7 +511,6 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
     }
 
     if (ch === '*' || ch === '_' || ch === '"') { // udon - add '"'
-// udon start
       var setEm = null, setStrong = null, setString = null
       if (ch === '_')
         setEm = !state.em         // Em
@@ -517,10 +518,9 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         setStrong = !state.strong // Strong
       else // '"'
         setString = !state.string // String
-// udon - XX fix modeCfg.highlightFormatting for string
-      // modeCfg.highlightFormatting (which is not enabled) may not be correct here (just move it down?)
       if (modeCfg.highlightFormatting)
-        state.formatting = setEm == null ? "strong" : setStrong == null ? "em" : "strong em"
+        if (setEm != null || setStrong != null) // udon - but not setString, '"' will be output
+          state.formatting = setEm == null ? "strong" : setStrong == null ? "em" : "strong em"
       // pop the essStack while updating
       // state until tokenType is popped
       function essStackPop(tokenType)
@@ -550,35 +550,29 @@ CodeMirror.defineMode("udon", function(cmCfg, modeCfg) {
         state.em = true
         state.essStack.push(tokenTypes.em)
       } else if (setEm === false) {
+        var t = getType(state) // highlight closing _
         essStackPop(tokenTypes.em)
-        return getType(state) // highlight closing _
+        return t
       }
       // Strong
       if (setStrong === true) {
         state.strong = true
         state.essStack.push(tokenTypes.strong)
       } else if (setStrong === false) {
+        var t = getType(state) // highlight closing *
         essStackPop(tokenTypes.strong)
-        return getType(state) // highlight closing *
+        return t
       }
       // String
       if (setString === true) {
         state.string = true
         state.essStack.push(tokenTypes.string)
       } else if (setString === false) {
+        var t = getType(state) // highlight closing "
         essStackPop(tokenTypes.string)
-        return getType(state) // highlight closing "
+        return t
       }
       return getType(state)
-// udon end
-    } else if (ch === ' ') {
-      if (stream.eat('*') || stream.eat('_')) { // Probably surrounded by spaces
-        if (stream.peek() === ' ') { // Surrounded by spaces, ignore
-          return getType(state);
-        } else { // Not surrounded by spaces, back up pointer
-          stream.backUp(1);
-        }
-      }
     }
 
     if (ch === ' ') {
